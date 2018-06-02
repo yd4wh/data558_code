@@ -2,6 +2,7 @@
 This module calls the ovo_linear_svm and compares to the sklearn version of
 SVC with linear kernel to compare performance in terms of misclassification error.
 """
+import numpy as np
 import ovo_linear_svm_real_world
 from sklearn import svm
 

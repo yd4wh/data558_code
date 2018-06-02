@@ -20,18 +20,18 @@ def preprocess():
     """
     Generates simulated data
 
-    Return: Processed version of X_train, y_train, X_val, y_val and X_test
+    Return: Processed version of X_train, y_train, X_val, and y_val
     """
     # Load the data
-    data1 = np.random.normal(loc=10,scale=1,size=(300,60))
-    data2 = np.random.normal(loc=50,scale=5,size=(300,60))
-    data3 = np.random.normal(loc=100,scale=3,size=(300,60))
+    data1 = np.random.normal(loc=5,scale=2,size=(3000,60))
+    data2 = np.random.normal(loc=50,scale=5,size=(3000,60))
+    data3 = np.random.normal(loc=500,scale=7,size=(3000,60))
 
     x = np.append(data1,data2,axis=0)
 
     x = np.append(x,data3,axis=0)
 
-    y = np.repeat([1,2,3],300,axis=0)
+    y = np.repeat([1,2,3],3000,axis=0)
 
     x_train, x_val, y_train, y_val = train_test_split(x, y, random_state=0, test_size=0.25)
 
@@ -78,7 +78,7 @@ def grad(beta, lambd, x, y, h=0.5):
     hinge_loss_prime = -(1+h-yt)/(2*h)*y*(np.abs(1-yt) <= h) - y*(yt < (1-h)) 
     return np.mean(hinge_loss_prime[:, np.newaxis]*x, axis=0) + 2*lambd*beta
 
-def backtracking(beta, lambd, x, y, step_size, alpha=0.5, frac=0.5, max_iter=100):
+def backtracking(beta, lambd, x, y, step_size, alpha=0.5, frac=0.5, max_iter=1000):
     """
     Implement the backtracking line search for fast gradient descent algorithm
 
@@ -182,7 +182,7 @@ def fold3_CV_for_lambda(x,y,index):
                                               step_size_init=1,
                                               max_iter=100)
             
-            y_hat = 2*(beta_vals[-1].dot(x[np.ix_(index == n)].T)>0)-1
+            y_hat = 2*(beta_vals.dot(x[np.ix_(index == n)].T)>0)-1
             
             
             error_rate = np.mean(y_hat != y[np.ix_(index == n)])
@@ -210,7 +210,8 @@ def ovo_classifier(X_train, y_train, X_val, y_val):
     :misclassification_error: error rate on the validation dataset
     """
     beta_matrix = []
-    obj_matrix =[]
+    #obj_matrix =[obj(np.zeros(X_train.shape[1]), 1, X_train, y_train, h=0.5)]
+    obj_matrix = []
     final_matrix = []
     final_matrix_test =[]
     for i in np.unique(y_train):
@@ -235,16 +236,21 @@ def ovo_classifier(X_train, y_train, X_val, y_val):
                                                   step_size_init=1)
                 
                 # Store classifier and objective value from each iteration
-                beta_matrix.append(beta_vals[-1])
-                obj_matrix.append(obj_vals)
+                beta_matrix.append(np.copy(beta_vals[-1]))
+                obj_matrix.append(np.copy(obj_vals))
+
                 print('starting prediction...', i, j)
                 # Predict y_val from X_val using the trained classifiers
                 pred = 2*(beta_vals.dot(X_val.T)>0)-1
                 y_hat = np.zeros(X_val.shape[0])
                 y_hat[pred[-1]==1] = j
                 y_hat[pred[-1]==-1] = i
-                final_matrix.append(y_hat)
+                final_matrix.append(np.copy(y_hat))
 
+    beta_matrix = np.array(beta_matrix)
+    obj_matrix = np.array(obj_matrix)
+    print('beta matrix shape:', beta_matrix.shape)
+    print('obj matrix shape:', obj_matrix.shape)
 
     prediction_matrix = np.array(final_matrix)
     
@@ -276,7 +282,7 @@ def visualization(obj_value):
     Return: plot of objective values for each class
     """
     for n in range(3):
-        plt.plot(obj_value[n],".");
+        plt.loglog(obj_value[n],".");
 
     plt.ylabel('objective values');
     plt.xlabel('iteration counter');

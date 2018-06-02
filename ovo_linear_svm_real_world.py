@@ -213,8 +213,10 @@ def ovo_classifier(X_train, y_train, X_val, y_val, X_test):
     obj_matrix =[]
     final_matrix = []
     final_matrix_test =[]
-    for i in np.unique(y_train):
-        for j in np.unique(y_train):
+    #for i in np.unique(y_train):
+    for i in range(2):
+        #for j in np.unique(y_train):
+        for j in range(3):
             if i < j:
                 print(i,j)
                 # Slicing X train and y train into each pair wise comparison
@@ -235,7 +237,7 @@ def ovo_classifier(X_train, y_train, X_val, y_val, X_test):
                                                   step_size_init=1)
                 
                 # Store classifier and objective value from each iteration
-                beta_matrix.append(beta_vals[-1])
+                beta_matrix.append(np.copy(beta_vals[-1]))
                 obj_matrix.append(obj_vals)
                 print('starting prediction...', i, j)
                 # Predict y_val from X_val using the trained classifiers
@@ -243,13 +245,13 @@ def ovo_classifier(X_train, y_train, X_val, y_val, X_test):
                 y_hat = np.zeros(X_val.shape[0])
                 y_hat[pred[-1]==1] = j
                 y_hat[pred[-1]==-1] = i
-                final_matrix.append(y_hat)
+                final_matrix.append(np.copy(y_hat))
                 # Predict y_test from X_test using the trained classifiers
                 pred_test = 2*(beta_vals.dot(X_test.T)>0)-1
                 y_hat_test = np.zeros(X_test.shape[0])
                 y_hat_test[pred_test[-1]==1] = j
                 y_hat_test[pred_test[-1]==-1] = i
-                final_matrix_test.append(y_hat_test)
+                final_matrix_test.append(np.copy(y_hat_test))
 
     prediction_matrix = np.array(final_matrix)
     prediction_test = np.array(final_matrix_test)
@@ -293,7 +295,7 @@ def visualization(obj_value):
 
     Return: plot of objective values for each class
     """
-    for n in range(45):
+    for n in range(3):
         plt.loglog(obj_value[n],".");
 
     plt.ylabel('objective values');
