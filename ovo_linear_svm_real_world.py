@@ -236,7 +236,7 @@ def ovo_classifier(X_train, y_train, X_val, y_val, X_test):
                 
                 # Store classifier and objective value from each iteration
                 beta_matrix.append(beta_vals[-1])
-                obj_matrix.append(obj_vals[-1])
+                obj_matrix.append(obj_vals)
                 print('starting prediction...', i, j)
                 # Predict y_val from X_val using the trained classifiers
                 pred = 2*(beta_vals.dot(X_val.T)>0)-1

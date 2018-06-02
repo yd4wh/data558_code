@@ -14,24 +14,26 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 
-def preprocess(data_dir):
+def preprocess():
     """
-    Using a given data folder directory, load the training, validation and test set 
-    and standardize the data.
-
-    Input:
-    :data_dir: folder name where the raw data is stored.
+    Generates simulated data
 
     Return: Processed version of X_train, y_train, X_val, y_val and X_test
-
     """
     # Load the data
-    x_train = np.load(os.path.join(data_dir, 'train_features.npy'))
-    y_train = np.load(os.path.join(data_dir, 'train_labels.npy'))
-    x_val = np.load(os.path.join(data_dir, 'val_features.npy'))
-    y_val = np.load(os.path.join(data_dir, 'val_labels.npy'))
-    x_test = np.load(os.path.join(data_dir, 'test_features.npy'))
+    data1 = np.random.normal(loc=10,scale=1,size=(300,60))
+    data2 = np.random.normal(loc=50,scale=5,size=(300,60))
+    data3 = np.random.normal(loc=100,scale=3,size=(300,60))
+
+    x = np.append(data1,data2,axis=0)
+
+    x = np.append(x,data3,axis=0)
+
+    y = np.repeat([1,2,3],300,axis=0)
+
+    x_train, x_val, y_train, y_val = train_test_split(x, y, random_state=0, test_size=0.25)
 
     # Standardize the data
     scaler = StandardScaler()
@@ -234,7 +236,7 @@ def ovo_classifier(X_train, y_train, X_val, y_val):
                 
                 # Store classifier and objective value from each iteration
                 beta_matrix.append(beta_vals[-1])
-                obj_matrix.append(obj_vals[-1])
+                obj_matrix.append(obj_vals)
                 print('starting prediction...', i, j)
                 # Predict y_val from X_val using the trained classifiers
                 pred = 2*(beta_vals.dot(X_val.T)>0)-1
@@ -273,8 +275,8 @@ def visualization(obj_value):
 
     Return: plot of objective values for each class
     """
-    for n in range(1):
-        plt.loglog(obj_value[n],".");
+    for n in range(3):
+        plt.plot(obj_value[n],".");
 
     plt.ylabel('objective values');
     plt.xlabel('iteration counter');
@@ -284,8 +286,8 @@ def visualization(obj_value):
 
 
 if __name__ == '__main__':
-    X_train,y_train,X_val,y_val,X_test = preprocess('data')
-    beta, obj, y_val, y_test, error = ovo_classifier(X_train,y_train,X_val,y_val)
+    X_train,y_train,X_val,y_val = preprocess()
+    beta, obj, y_val, error = ovo_classifier(X_train,y_train,X_val,y_val)
     pd.DataFrame(beta).to_csv("beta.csv")
     pd.DataFrame(beta).to_csv("obj.csv")
     pd.DataFrame(y_val).to_csv("y_val.csv")
