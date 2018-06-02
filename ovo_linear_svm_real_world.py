@@ -213,10 +213,8 @@ def ovo_classifier(X_train, y_train, X_val, y_val, X_test):
     obj_matrix =[]
     final_matrix = []
     final_matrix_test =[]
-    #for i in np.unique(y_train):
-    for i in range(2):
-        #for j in np.unique(y_train):
-        for j in range(3):
+    for i in np.unique(y_train):
+        for j in np.unique(y_train):
             if i < j:
                 print(i,j)
                 # Slicing X train and y train into each pair wise comparison
@@ -295,7 +293,7 @@ def visualization(obj_value):
 
     Return: plot of objective values for each class
     """
-    for n in range(3):
+    for n in range(45):
         plt.loglog(obj_value[n],".");
 
     plt.ylabel('objective values');
