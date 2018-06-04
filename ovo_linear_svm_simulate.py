@@ -8,32 +8,30 @@ as the final prediction.
 """
 
 import os
+import random
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from sklearn.datasets import make_classification
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 def preprocess():
     """
-    Generates simulated data
+    Generates simulated data through sklearn make classification function
 
     Return: Processed version of X_train, y_train, X_val, and y_val
     """
     # Load the data
-    data1 = np.random.normal(loc=5,scale=2,size=(3000,60))
-    data2 = np.random.normal(loc=50,scale=5,size=(3000,60))
-    data3 = np.random.normal(loc=500,scale=7,size=(3000,60))
+    random.seed(77)
+    X,y = make_classification(n_samples=500, n_features=30, n_informative=8, n_redundant=2, 
+                              n_repeated=0, n_classes=3, n_clusters_per_class=2, weights=None, 
+                              flip_y=0.01, class_sep=1.0, hypercube=True, shift=0.0, scale=1.0, 
+                              shuffle=True, random_state=None)
 
-    x = np.append(data1,data2,axis=0)
-
-    x = np.append(x,data3,axis=0)
-
-    y = np.repeat([1,2,3],3000,axis=0)
-
-    x_train, x_val, y_train, y_val = train_test_split(x, y, random_state=0, test_size=0.25)
+    x_train, x_val, y_train, y_val = train_test_split(X, y, random_state=0, test_size=0.25)
 
     # Standardize the data
     scaler = StandardScaler()
